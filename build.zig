@@ -45,9 +45,15 @@ pub fn linkSdl3(
     } else {
         // SDL3 compiled from source
         sdl3_options.addOption(std.SemanticVersion, "version", .{ .major = 3, .minor = 0, .patch = 0 });
+        const system_incude_path = b.option(std.Build.LazyPath, "sdl3_incule_path", "system include path used by a source-compiled SDL3");
+        const system_framework_path = b.option(std.Build.LazyPath, "sdl3_framework_path", "framework path used by a source-compiled SDL3");
+        const library_path = b.option(std.Build.LazyPath, "sdl3_library_path", "library path used by a source-compiled SDL3");
         if (b.lazyDependency("sdl3", .{
             .target = target,
             .optimize = optimize,
+            .system_include_path = system_incude_path,
+            .system_framework_path = system_framework_path,
+            .library_path = library_path,
         })) |sdl3| {
             sdl_mod.linkLibrary(sdl3.artifact("SDL3"));
         }
@@ -441,6 +447,8 @@ pub fn buildBackend(backend: Backend, test_dvui_and_app: bool, dvui_opts_in: Dvu
                 "callbacks",
                 b.option(bool, "sdl3-callbacks", "Use callbacks for live resizing on windows/mac"),
             );
+
+            
 
             linkSdl3(b, sdl_mod, sdl3_options, target, optimize);
 
